@@ -23,18 +23,18 @@ function createGradient(canvas, options) {
   verifyCanvas(canvas);
 
   const {
+    height,
     width,
-    height
   } = canvas;
 
   const {
-    startColor = '#000',
-    startStop = 0,
     endColor = '#fff',
     endStop = 1,
+    startColor = '#000',
+    startStop = 0,
     x0 = 0,
-    y0 = 0,
     x1 = width,
+    y0 = 0,
     y1 = height,
   } = options;
 
@@ -49,15 +49,15 @@ function createGradient(canvas, options) {
 
 function drawBorder(context, options) {
   const {
+    borderFill = '#fff',
+    borderWidth = 0,
+    height = 100,
+    width = 100,
     x0 = 0,
     y0 = 0,
-    width = 100,
-    height = 100,
-    borderWidth = 0,
-    borderStyle = '#fff',
   } = options;
 
-  context.fillStyle = borderStyle;
+  context.fillStyle = borderFill;
 
   context.fillRect(
     x0 - borderWidth,
@@ -86,13 +86,13 @@ function drawScale(canvas, scale, fontSize = 24) {
 
 function drawRectangle(context, options) {
   const {
+    borderWidth = 2,
+    fillStyle = '#808080',
+    height = 100,
+    width = 100,
+    withBorder = true,
     x0 = 0,
     y0 = 0,
-    width = 100,
-    height = 100,
-    fillStyle = '#808080',
-    withBorder = true,
-    borderWidth = 2,
   } = options;
 
   if (withBorder) {
@@ -119,8 +119,8 @@ function bulletChart(providedCanvas, options) {
   verifyCanvas(canvas);
 
   const {
+    height: canvasHeight,
     width,
-    height: canvasHeight
   } = canvas;
 
   const {
@@ -128,6 +128,7 @@ function bulletChart(providedCanvas, options) {
     values = [],
     fontSize = 12,
     scalePadding = 7,
+    withBorder = false,
   } = options;
 
   const maxHeight = canvasHeight - fontSize - scalePadding;
@@ -137,26 +138,23 @@ function bulletChart(providedCanvas, options) {
 
   const context = getContext(canvas);
 
-  values.forEach(({ name, value, fillColor, gradientOptions }, index) => {
+  values.forEach(({ name, value = 0, fillColor = '#000', gradientOptions }, index) => {
     let fillStyle = fillColor;
     if (gradientOptions && Object.entries(gradientOptions).length > 0) {
       fillStyle = createGradient(canvas, gradientOptions);
     }
-
-    console.log(heightDecrease);
 
     height = maxHeight - (heightDecrease * index);
 
     drawRectangle(
       context,
       {
-        withBorder: true,
-        borderWidth:0,
-        y0: canvasHeight - maxHeight + ((maxHeight - height) / 2),
-        height,
         borderWidth: 1,
         fillStyle,
+        height,
         width: width * (value / scale),
+        withBorder,
+        y0: canvasHeight - maxHeight + ((maxHeight - height) / 2),
       }
     );
   });

@@ -1,6 +1,6 @@
 {
   "name": "canvas-bullet-chart",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Render a simple bullet chart on a canvas",
   "main": "index.js",
   "scripts": {
