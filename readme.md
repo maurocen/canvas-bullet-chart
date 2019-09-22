@@ -4,6 +4,10 @@
 1. ```import bulletChart from 'canvas-bullet-chart'```
 2. Call ```bulletChart(canvas, options)```.
 
+Or:
+1. ```import { bulletChartImage } from 'canvas-bullet-chart```;
+2. Call ```bulletChartImage(options)```
+
 # Function parameters
 
 ## canvas
@@ -23,6 +27,10 @@ Object containing the desired options and values.
 |**scalePadding**|*Number*|Space between the labels and the bullet chart.|7|
 |**values**|*Array*|Explained [here](#values).|[]|
 |**withBorder**|*Boolean*|Should a border be drawn around each box|```false```|
+|**scaleColor**|*String*|Font color for scale|```#000```|
+|**width**|*Number*|Width of the desired image. **Note:** for ```bulletChartImage``` only|1280|
+|**height**|*Number*|Height of the desired image. **Note:** for ```bulletChartImage``` only|720|
+
 
 ## Values
 

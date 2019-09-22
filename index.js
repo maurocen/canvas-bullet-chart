@@ -50,7 +50,6 @@ function createGradient(canvas, options) {
 function drawBorder(context, options) {
   const {
     borderFill = '#fff',
-    borderWidth = 0,
     height = 100,
     width = 100,
     x0 = 0,
@@ -60,14 +59,14 @@ function drawBorder(context, options) {
   context.fillStyle = borderFill;
 
   context.fillRect(
-    x0 - borderWidth,
-    y0 - borderWidth,
-    width + borderWidth,
-    height + borderWidth
+    x0,
+    y0,
+    width,
+    height
   );
 }
 
-function drawScale(canvas, scale, fontSize = 24) {
+function drawScale(canvas, scale, fontSize = 24, scaleColor = '#000') {
   verifyCanvas(canvas);
 
   const context = getContext(canvas);
@@ -76,8 +75,9 @@ function drawScale(canvas, scale, fontSize = 24) {
     width,
   } = canvas;
 
-  context.font = `${fontSize}px Arial`;
-  context.textAlign = "left";
+  context.font = `${fontSize}px sans-serif`;
+  context.fillStyle = scaleColor;
+  context.textAlign = "center";
 
   for (let i = 1; i < scale; i++) {
     context.fillText(i, i * (width/scale), fontSize);
@@ -124,17 +124,20 @@ function bulletChart(providedCanvas, options) {
   } = canvas;
 
   const {
-    scale = 1,
-    values = [],
+    borderFill = '#fff',
+    borderWidth = 2,
     fontSize = 12,
+    scale = 1,
+    scaleColor,
     scalePadding = 7,
+    values = [],
     withBorder = false,
   } = options;
 
   const maxHeight = canvasHeight - fontSize - scalePadding;
   const heightDecrease = options.heightDecrease || maxHeight / (values.length + 1);
 
-  drawScale(canvas, scale, fontSize);
+  drawScale(canvas, scale, fontSize, scaleColor);
 
   const context = getContext(canvas);
 
@@ -144,20 +147,46 @@ function bulletChart(providedCanvas, options) {
       fillStyle = createGradient(canvas, gradientOptions);
     }
 
+    let newBorderFill = borderFill;
+
+    if (borderFill && typeof borderFill !== 'string') {
+      newBorderFill = createGradient(canvas, borderFill);
+    }
+
     height = maxHeight - (heightDecrease * index);
 
     drawRectangle(
       context,
       {
-        borderWidth: 1,
+        borderWidth,
         fillStyle,
         height,
         width: width * (value / scale),
         withBorder,
+        borderFill: newBorderFill,
         y0: canvasHeight - maxHeight + ((maxHeight - height) / 2),
       }
     );
   });
 }
 
-module.exports = bulletChart;
+function bulletChartImage(options) {
+  const {
+    width = 1280,
+    height = 720,
+  } = options;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  canvas.id = "ASD"
+
+  bulletChart(canvas, options);
+
+  const image = canvas.toDataURL();
+
+  return image;
+}
+
+const exported = module.exports = bulletChart;
+exported.bulletChartImage = bulletChartImage;
