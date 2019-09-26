@@ -139,12 +139,13 @@ function bulletChart(providedCanvas, options) {
   } = options;
 
   const maxHeight = canvasHeight - fontSize - scalePadding;
-  const heightDecrease = options.heightDecrease || maxHeight / (values.length + 2);
+  const defaultHeightDecrease = maxHeight / (values.length - 1/2);
+  const heightDecrease = options.heightDecrease || defaultHeightDecrease;
   let startingHeight = maxHeight;
 
   if (
     baseHeight &&
-    ((baseHeight + heightDecrease * (values.length)/2) <= maxHeight)
+    ((baseHeight + heightDecrease * values.length / 2) <= maxHeight)
   ) {
     startingHeight = baseHeight + heightDecrease * values.length;
   } else {
