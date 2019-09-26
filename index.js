@@ -77,6 +77,9 @@ function drawScale(canvas, scale, fontSize = 24, scaleColor = '#000') {
 
   context.font = `${fontSize}px sans-serif`;
   context.fillStyle = scaleColor;
+
+  context.textAlign = 'left';
+  context.fillText(0, 0, fontSize);
   context.textAlign = "center";
 
   for (let i = 1; i < scale; i++) {
@@ -125,6 +128,7 @@ function bulletChart(providedCanvas, options) {
 
   const {
     borderFill = '#fff',
+    baseHeight,
     borderWidth = 2,
     fontSize = 12,
     scale = 1,
@@ -135,7 +139,31 @@ function bulletChart(providedCanvas, options) {
   } = options;
 
   const maxHeight = canvasHeight - fontSize - scalePadding;
-  const heightDecrease = options.heightDecrease || maxHeight / (values.length + 1);
+  const defaultHeightDecrease = maxHeight / (values.length - 1/2);
+  const heightDecrease = options.heightDecrease || defaultHeightDecrease;
+  let startingHeight = maxHeight;
+
+  if (
+    baseHeight &&
+    ((baseHeight + heightDecrease * values.length / 2) <= maxHeight)
+  ) {
+    startingHeight = baseHeight + heightDecrease * values.length;
+  } else {
+    if (baseHeight) {
+      const minimumCanvasSizeAccepted = (baseHeight + heightDecrease * (values.length)) + fontSize + scalePadding;
+      console.group('Not enough canvas space');
+      console.warn(
+        `Not enough canvas space for baseHeight ${baseHeight} and heightDecrease ${heightDecrease}`
+      );
+      console.info(`Minimum accepted canvas size: ${minimumCanvasSizeAccepted}`);
+      console.info(`Falling back to baseHeight ${maxHeight - (heightDecrease * (values.length + 1))} and heightDecrease ${heightDecrease}`)
+      console.groupEnd('Not enough canvas space');
+    }
+  }
+
+  if (scalePadding + fontSize + startingHeight <= canvas.height) {
+    canvas.height = scalePadding + fontSize + startingHeight;
+  }
 
   drawScale(canvas, scale, fontSize, scaleColor);
 
@@ -153,20 +181,24 @@ function bulletChart(providedCanvas, options) {
       newBorderFill = createGradient(canvas, borderFill);
     }
 
-    height = maxHeight - (heightDecrease * index);
+    height = startingHeight - 2 * (heightDecrease * index);
 
-    drawRectangle(
-      context,
-      {
-        borderWidth,
-        fillStyle,
-        height,
-        width: width * (value / scale),
-        withBorder,
-        borderFill: newBorderFill,
-        y0: canvasHeight - maxHeight + ((maxHeight - height) / 2),
-      }
-    );
+    if (height > 0) {
+      drawRectangle(
+        context,
+        {
+          borderWidth,
+          fillStyle,
+          height,
+          width: width * (value / scale),
+          withBorder,
+          borderFill: newBorderFill,
+          y0: fontSize + scalePadding + heightDecrease * index,
+        }
+      );
+    } else {
+      throw new Error('Cannot draw rectangle');
+    }
   });
 }
 
